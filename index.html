@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Weather</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="weather-widget">
+      <div class="location">
+        <h1 id="city">Loading...</h1>
+        <p id="date"></p>
+      </div>
+      <div class="weather-icon">
+        <img id="weather-icon" src="" alt="Weather Icon">
+      </div>
+      <div class="temperature">
+        <h2 id="temperature">--°C</h2>
+      </div>
+      <div class="description">
+        <p id="weather-description">--</p>
+      </div>
+      <div class="details">
+        <p id="humidity">Humidity: --%</p>
+        <p id="wind-speed">Wind Speed: -- m/s</p>
+      </div>
+      <div class="input-container">
+        <input type="text" id="city-input" placeholder="Enter City" />
+        <button id="get-weather">Get Weather</button>
+      </div>
+    </div>
+  </div>
+  <script>
+            const apiKey = '8af05253a87c7a5d4075218c109fad0c'; // Add your OpenWeather API key here
+            const weatherIcon = document.getElementById('weather-icon');
+            const cityElement = document.getElementById('city');
+            const temperatureElement = document.getElementById('temperature');
+            const descriptionElement = document.getElementById('weather-description');
+            const humidityElement = document.getElementById('humidity');
+            const windSpeedElement = document.getElementById('wind-speed');
+            const dateElement = document.getElementById('date');
+            const cityInput = document.getElementById('city-input');
+            const getWeatherButton = document.getElementById('get-weather');
+
+            function fetchWeatherData(city) {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+                .then(response => response.json())
+                .then(data => {
+                updateWeatherWidget(data);
+                })
+                .catch(error => {
+                console.error('Error fetching weather data:', error);
+                cityElement.innerText = 'City not found';
+                });
+            }
+
+            function updateWeatherWidget(data) {
+            const weather = data.weather[0];
+            const main = data.main;
+            const wind = data.wind;
+
+            cityElement.innerText = data.name;
+            temperatureElement.innerText = `${Math.round(main.temp)}°C`;
+            descriptionElement.innerText = weather.description;
+            humidityElement.innerText = `Humidity: ${main.humidity}%`;
+            windSpeedElement.innerText = `Wind Speed: ${wind.speed} m/s`;
+
+            const iconUrl = `http://openweathermap.org/img/wn/${weather.icon}@2x.png`;
+            weatherIcon.src = iconUrl;
+
+            // Update date
+            const currentDate = new Date();
+            dateElement.innerText = currentDate.toDateString();
+            }
+
+            // Event listener for button click
+            getWeatherButton.addEventListener('click', () => {
+            const city = cityInput.value;
+            if (city) {
+                fetchWeatherData(city);
+            } else {
+                cityElement.innerText = 'Please enter a city';
+            }
+            });
+
+            // Initial weather fetch for default city
+            fetchWeatherData('Chennai');
+
+  </script>
+</body>
+</html>
